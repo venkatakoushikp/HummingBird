@@ -14,7 +14,7 @@ with open('data_HBD.pkl', 'rb') as f:
 humm_bird=tk.Tk()
 humm_bird.geometry('1010x700')
 humm_bird.resizable(0,0)
-humm_bird.title("LACP Analyser - HummingBird")
+humm_bird.title("HummingBird")
 
 image = Image.open("/Users/venkata.koushik/Downloads/aristalogo.png")
 image=image.resize((150,40))

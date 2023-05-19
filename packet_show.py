@@ -16,7 +16,7 @@ humm_bird2.resizable(0,0)
 humm_bird2.title("Packet Viewer - HummingBird")
 
 def on_wireshark():
-    cmd = "wireshark "+my_object["filename_"]
+    cmd = "wireshark "+my_object["filename_1"]
     output = subprocess.check_output(cmd, shell=True, text=True)
 
 wireshark_b=tk.Button(humm_bird2,text="View on Wireshark",width=25,command=on_wireshark)
@@ -27,7 +27,7 @@ canv.place(x=10,y=100)
 text_can=tk.Label(canv,text="k",bg='black')
 text_can.place(x=10,y=10)
 def on_here():
-    packets=rdpcap(my_object['filename_'])
+    packets=rdpcap(my_object['filename_1'])
     a=len(packets)
     l=tk.Scale(humm_bird2,from_=1,to=a,orient="horizontal",length=700)
     l.place(x=10,y=40)
@@ -39,7 +39,7 @@ def on_here():
             my_object = pickle.load(f)
             print(my_object)
         import pyshark
-        capture = pyshark.FileCapture(my_object['filename_'])
+        capture = pyshark.FileCapture(my_object['filename_1'])
         a=capture[int(l.get())-1]
         text_can.configure(text=a,font=('Times new roman',11))
 
