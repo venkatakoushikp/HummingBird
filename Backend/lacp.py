@@ -18,4 +18,6 @@ for packet in packets:
             print("No LACP configs present in",packet.src)
         if packet[LACP].partner_system == '00:00:00:00:00:00':
             print("No LACP configs present in the partner. Check",count,"th packet")
+        if packet[LACP].actor_state != packet[LACP].partner_state:
+            print("There is mismatch in flags. Check",count,"th packet")
 print("Result after verifying",count,"packets in the uploaded pcap")
