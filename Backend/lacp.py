@@ -13,5 +13,9 @@ os.system('clear')
 count =0
 for packet in packets:
     if packet.haslayer(LACP):
-        count =count+1
-print(count)
+        count = count+1
+        if packet[LACP].actor_system == '00:00:00:00:00:00':
+            print("No LACP configs present in",packet.src)
+        if packet[LACP].partner_system == '00:00:00:00:00:00':
+            print("No LACP configs present in the partner. Check",count,"th packet")
+print("Result after verifying",count,"packets in the uploaded pcap")
