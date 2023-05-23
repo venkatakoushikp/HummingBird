@@ -21,7 +21,7 @@ humm_bird.geometry('1010x400')
 humm_bird.resizable(0,0)
 humm_bird.title("Deep Packet Inspection Tool")
 
-image = Image.open("/Users/venkata.koushik/Downloads/aristalogo.png")
+image = Image.open("/Users/priya.saragadam/Downloads/arista_logo.ong.png")
 image=image.resize((150,40))
 image = ImageTk.PhotoImage(image)
 label = tk.Label(humm_bird, image=image)
