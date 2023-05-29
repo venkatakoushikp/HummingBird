@@ -1,14 +1,9 @@
-'''
-Code for automating the troubleshooting of OSPF via the packets from the pcap file
-Created by Lakshmi Priya Saragadam, May 20, 2023.
-HummingBird- The deep packet inspection tool
-'''
 from scapy.all import *
 from scapy.contrib.ospf import *
 from os import system
 packets = rdpcap('/Users/priya.saragadam/Documents/Wireshark_HomePractise/ospf_day1.pcap')
 os.system('clear')
-interested_flows= list(set(packet[IP].src for packet in packets if packet.haslayer(OSPF_Hdr)))
+#interested_flows= list(set(packet[IP].src for packet in packets if packet.haslayer(OSPF_Hdr)))
 count=0
 # Iterate through the packets
 for packet in packets:
@@ -34,3 +29,13 @@ for packet in packets:
                         print("There is mismatch in the area types of",flow_1,"and",flow_2)         #check-6:Options mismatch
                     if packet[OSPF_Hello].deadinterval != p[OSPF_Hello].deadinterval:
                         print("There a dead interval mismatch in",flow_1,"and",flow_2)              #check-7:Dead Interval
+                    if packet[OSPF_Hello].router != '0.0.0.0' and  packet[OSPF_Hello].backup != '0.0.0.0':
+                        if packet[OSPF_Hello].router != flow_2 or packet[OSPF_Hello].router != flow_1:
+                            print("Stuck in 2-way or The router is establishing neighborship with DROther")
+                    if p[OSPF_Hello].router != '0.0.0.0' and  p[OSPF_Hello].backup != '0.0.0.0':
+                        if p[OSPF_Hello].router != flow_2 or p[OSPF_Hello].router != flow_1:
+                            print("Stuck in 2-way or The router is establishing neighborship with DROther")
+                    if packet.haslayer(OSPF_DBDesc) and p.haslayer(OSPF_DBDesc):
+                        print("There is unicast reachability. Passed the exstart state")
+                        if packet[OSPF_DBDesc].mtu != p[OSPF_DBDesc].mtu:
+                            print("There is mtu mismatch. Stuck at exchange state")
