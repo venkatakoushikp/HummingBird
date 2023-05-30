@@ -6,7 +6,7 @@ with open('data_HBD.pkl', 'rb') as f:
     my_object = pickle.load(f)
     print(my_object)
 
-packets = rdpcap(my_object['filename_1'])
+packets = rdpcap(my_object["filename_1"])
 
 with open('data_HBD.pkl', 'rb') as f:
     my_object = pickle.load(f)
@@ -113,22 +113,37 @@ if len(dict_ospf["DBD_1"])==0:
     a="(010) DBD packets not received from {}".format(my_object["ip_1"])
     analysis.append(a)
     count+=1
+    new_var={"Info":info,"Analysis":analysis}
+    with open('OSPF_info.pkl', 'wb') as fp:
+        pickle.dump(new_var, fp)
+        print('dictionary saved successfully to file')
+    quit()
+    
 
 if len(dict_ospf["DBD_2"])==0:
     a="(011) DBD packets not received from {}".format(my_object["ip_2"])
     analysis.append(a)
     count+=1
+    new_var={"Info":info,"Analysis":analysis}
+    with open('OSPF_info.pkl', 'wb') as fp:
+        pickle.dump(new_var, fp)
+        print('dictionary saved successfully to file')
+    quit()
 
 if count==0:
     info.append("Exchange")
 
-dbd1=packets[dict_ospf["DBD_1"][-1]]
-dbd2=packets[dict_ospf["DBD_2"][-1]]
+try:
+    dbd1=packets[dict_ospf["DBD_1"][-1]]
+    dbd2=packets[dict_ospf["DBD_2"][-1]]
 
-if dbd1[OSPF_Hdr].mtu!=dbd2[OSPF_Hdr].mtu:
-    a="(012) MTU Mismatch"
-    count+=1
-    analysis.append(a)
+    if dbd1[OSPF_Hdr].mtu!=dbd2[OSPF_Hdr].mtu:
+        a="(012) MTU Mismatch"
+        count+=1
+        analysis.append(a)
+except:
+    IndexError
+
 print(info,analysis)
 new_var={"Info":info,"Analysis":analysis}
 with open('OSPF_info.pkl', 'wb') as fp:
