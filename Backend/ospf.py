@@ -2,7 +2,11 @@ from scapy.all import *
 from scapy.contrib.ospf import *
 import pickle
 
-packets = rdpcap('ospf_day1.pcap')
+with open('data_HBD.pkl', 'rb') as f:
+    my_object = pickle.load(f)
+    print(my_object)
+
+packets = rdpcap(my_object['filename_1'])
 
 with open('data_HBD.pkl', 'rb') as f:
     my_object = pickle.load(f)
@@ -17,14 +21,14 @@ analysis=[]
 info=[]
 count=0
 for i in range(len(packets)):
-    if packets[i][IP].src=="10.1.1.1":
+    if packets[i][IP].src==my_object["ip_1"]:
         try:
             if packets[i][OSPF_Hello]:
                 dict_ospf["Hello_1"].append(i)
         
         except IndexError:
             pass
-    if packets[i][IP].src=="10.1.1.2":
+    if packets[i][IP].src==my_object["ip_2"]:
         try:
             if packets[i][OSPF_Hello]:
                 dict_ospf["Hello_2"].append(i)
@@ -56,7 +60,7 @@ if len(dict_ospf["Hello_2"])==0:
     count+=1
 hell_1=packets[dict_ospf["Hello_1"][-1]]
 hell_2=packets[dict_ospf["Hello_2"][-1]]
-hell_2=hell_1
+
 if (hell_1[OSPF_Hdr].area != hell_2[OSPF_Hdr].area):
     a="(002) Area Mismatch"
     count+=1
@@ -77,7 +81,7 @@ if (hell_1[OSPF_Hello].deadinterval != hell_2[OSPF_Hello].deadinterval):
     a="(006) Different deadinterval"
     count+=1
     analysis.append(a)
-if (hell_1[OSPF_Hdr].src != hell_2[OSPF_Hdr].src):
+if (hell_1[OSPF_Hdr].src == hell_2[OSPF_Hdr].src):
     a="(007) Same Router ID"
     count+=1
     analysis.append(a)
@@ -104,7 +108,7 @@ if hell_2[OSPF_Hello].router!=my_object["ip_2"] and hell_2[OSPF_Hello].backup!=m
 
 if count==0:
     info.append("EX Start")
-dict_ospf["DBD_1"]=[]
+
 if len(dict_ospf["DBD_1"])==0:
     a="(010) DBD packets not received from {}".format(my_object["ip_1"])
     analysis.append(a)
@@ -117,7 +121,7 @@ if len(dict_ospf["DBD_2"])==0:
 
 if count==0:
     info.append("Exchange")
-'''
+
 dbd1=packets[dict_ospf["DBD_1"][-1]]
 dbd2=packets[dict_ospf["DBD_2"][-1]]
 
@@ -125,7 +129,7 @@ if dbd1[OSPF_Hdr].mtu!=dbd2[OSPF_Hdr].mtu:
     a="(012) MTU Mismatch"
     count+=1
     analysis.append(a)
-print(info,analysis)'''
+print(info,analysis)
 new_var={"Info":info,"Analysis":analysis}
 with open('OSPF_info.pkl', 'wb') as fp:
     pickle.dump(new_var, fp)
