@@ -72,16 +72,8 @@ ana_text_re=tk.Label(ana2_bann2,text="From PCAP 2 :",bg='black',fg='#00FF00',fon
 ana_text_re.place(x=10,y=10)
 ## ## ## ## ## ## ##
 def on_open():
-    from tkinter.filedialog import askopenfilename
-
-    
-    try:
-        global filename_
-        fileselect=askopenfilename(filetypes=(('text files', '*.txt'),('PCAP','*.pcap'),('PCAPNG','*.pcapng')))
-        print(fileselect)
-        filename_=fileselect
-    except:
-        TypeError 
+    humm_bird.destroy()
+    import entry_screen
 
 
 def cap_ana():
