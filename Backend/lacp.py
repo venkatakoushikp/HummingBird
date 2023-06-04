@@ -37,11 +37,11 @@ if len(dict_ospf["LACP_packet"])==0:
 
 #hell_1 = packets[dict_ospf["LACP_packet"][-1]]
 
-if  (hell_1[LACP].partner_system == '00:00:00:00'):
-        a = "Check if the following config is given at the interface level: 'channel-group <oper-key> mode active'"
+if  (hell_1[LACP].partner_system == '00:00:00:00:00:00'):
+        a = "Check if the following config is given at the interface level:\n'channel-group <oper-key> mode active' on the partner interface."
         count+=1
         analysis.append(a)
-        info.append("Partner Sys-id is 00:00:00:00")
+        info.append("Partner Sys-id is 00:00:00:00:00:00")
 elif (hell_1[LACP].actor_state != hell_1[LACP].partner_state):
     actor_state = hell_1[LACP].actor_state
     expired_bit_1 = get_bit(actor_state, 7)
@@ -61,12 +61,12 @@ elif (hell_1[LACP].actor_state != hell_1[LACP].partner_state):
     collecting_bit = get_bit(actor_state, 2)
     distributing_bit = get_bit(actor_state, 1)
     if (active_bit_1 == 0) and (active_bit == 0):
-        a = "Check if both the actor aand partner are given passive-passive configurations"
+        a = "Check if both the actor and partner are given passive-passive configurations"
         count+=1
         analysis.append(a)
-        info.append("Passive mode on both Actor and Passive")
+        info.append("Passive mode on both Actor and Partner")
     if (aggregation_bit_1 != aggregation_bit):
-        a = "Check the link speeds on both the actor and partner systems\nCheck the no. of ports per port-channel to be bundelled."
+        a = "Check the following:\nLink speeds on both the actor and partner systems\nThe no. of ports per port-channel to be bundelled."
         count+=1
         analysis.append(a)
         info.append("Aggregation bit mismatch ")
@@ -86,7 +86,7 @@ elif (hell_1[LACP].actor_state != hell_1[LACP].partner_state):
         info.append("Expired bit set")
     if (collecting_bit_1 == 0) or (collecting_bit ==0):
         if (hell_1[LACP].actor_system_priority != hell_1[LACP].actor_port_priority) or (hell_1[LACP].partner_system_priority != hell_1[LACP].partner_port_priority):
-            a = "Check if the port is configured for LACP\nCheck if the port is connected to a partner port that is also configured for LACP\nConfigure the system priority and port priority of the two ports to be same"
+            a = "Check if the port is configured for LACP\nCheck if the port is connected to a partner port for LACP\nConfigure the same system priority and port priority"
             count+=1
             analysis.append(a)
             info.append("Mismatch in system priority and port priority")
@@ -95,4 +95,3 @@ new_var={"Info":info,"Analysis":analysis}
 with open('OSPF_info.pkl', 'wb') as fp:
     pickle.dump(new_var, fp)
     print('dictionary saved successfully to file')
-    
