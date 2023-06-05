@@ -386,7 +386,7 @@ def on_proceed():
 
         humm_bird.destroy()
         if vars["protocol"]=='LACP':
-            import ospf
+            import lacp
             import Demo_ 
         elif vars["protocol"]=='OSPF':
             import Pac1
