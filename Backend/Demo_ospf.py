@@ -10,9 +10,13 @@ import pickle
 with open('data_HBD.pkl', 'rb') as f:
     my_object = pickle.load(f)
     print(my_object)
-with open('OSPF_info.pkl', 'rb') as f:
+with open('OSPF_info_1.pkl', 'rb') as f:
     my_object2 = pickle.load(f)
     print(my_object2)
+if my_object["filename_2"]!="":
+    with open('OSPF_info_2.pkl', 'rb') as f:
+        my_object3 = pickle.load(f)
+        print(my_object3)
 
 
 humm_bird=tk.Tk()
@@ -20,7 +24,7 @@ humm_bird.geometry('1010x750')
 humm_bird.resizable(0,0)
 humm_bird.title("HummingBird")
 
-image = Image.open("/Users/venkata.koushik/Downloads/aristalogo.png")
+image = Image.open("/Users/priya.saragadam/Downloads/arista_logo.ong.png")
 image=image.resize((150,40))
 image = ImageTk.PhotoImage(image)
 label = tk.Label(humm_bird, image=image)
@@ -39,9 +43,12 @@ ana1_text.place(x=10,y=40)
 
 ana2_bann2=tk.Canvas(humm_bird, border=0,width=900,height=130,bg='black')
 ana2_bann2.place(x=50,y=260)
-
-ana2_text=tk.Label(ana2_bann2,text=" Not used",font=("Times New Roman",15),fg='red',bg='black')
-ana2_text.place(x=10,y=40)
+if my_object["filename_2"]=="":
+    ana2_text=tk.Label(ana2_bann2,text=" Not used",font=("Times New Roman",15),fg='red',bg='black')
+    ana2_text.place(x=10,y=40)
+else:
+    ana2_text=tk.Label(ana2_bann2,text=" Start Report Generation",font=("Times New Roman",15),fg='red',bg='black')
+    ana2_text.place(x=10,y=40)
 
 analysis_banner=tk.Canvas(humm_bird,border=0,width=420,height=200,bg='black')
 analysis_banner.place(x=50,y=420)
@@ -73,7 +80,7 @@ ana_text_re.place(x=10,y=10)
 ## ## ## ## ## ## ##
 def on_open():
     humm_bird.destroy()
-    import entry_screen
+    import Main_Program
 
 
 def cap_ana():
@@ -118,25 +125,44 @@ button_help.place(x=320,y=7)
 def on_show():
     import packet_show
 def on_report():
-    if my_object2['Analysis']==[]:
+    if my_object2['Analysis']==[] and my_object3['Analysis']==[]:
         sol_text.configure(text=" No errors")
         ana_text.configure(text="OSPF Neighborship up")
     else:
         final_s=""
-        for i in my_object2["Analysis"]:
-            final_s+=i
-            final_s+='\n'
-        sol_text.configure(text=final_s)
-    if my_object2["Info"]==[]:
-        ana_text.configure(text="Hasnt even reached INIT State")
+        if my_object2["Analysis"] == my_object3["Analysis"]:
+            for i in my_object2["Analysis"]:
+                final_s+=i
+                final_s+='\n'
+            sol_text.configure(text=final_s)
+        else:
+            s =[]
+            s.append(final_s)
+            for i in my_object3["Analysis"]:
+                final_s+=i
+                final_s+='\n'
+            s.append(final_s)
+            sol_text.configure(text=s)
+
+    if my_object2["Info"]==[] and my_object3["Info"]==0:
+        ana_text.configure(text="Hasn't even reached INIT State")
         ana1_text.configure(text="Parameter Mismatch, check Insights")
+        ana2_text.configure(text="Parameter Mismatch, check Insights")
     else:
+        s = []
         final_s=""
         for i in my_object2["Info"]:
             final_s+=i
             final_s+=' reached \n'
-        ana1_text.configure(text=final_s)
-    if str(my_object2["Analysis"])[3:6]=='010':
+        s = []
+        s.append(final_s)
+        for i in my_object3["Info"]:
+            final_s+=i
+            final_s+=' reached \n'
+        s.append(final_s)
+        ana1_text.configure(text=s)
+
+    if str(my_object2["Analysis"])[3:6]=='010' and str(my_object3["Analysis"])[3:6]=='010':
         ana_text.configure(text=my_object2["Analysis"])
         sol_text.configure(text="Unicast Reachability Issue or ACL Applied")
 
