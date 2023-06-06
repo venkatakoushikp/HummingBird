@@ -181,7 +181,7 @@ dbd2=dbd2.ospf._all_fields
 
 if dbd1['ospf.db.dd_sequence']!=dbd2['ospf.db.dd_sequence']:
     print(dbd1['ospf.db.dd_sequence'],dbd2['ospf.db.dd_sequence'])
-    a="Sequence Number Mismatch\n{}'s  SEQ :{} <==> {}'s  SEQ :{} ".format(my_object["ip_1"],dbd1['ospf.db.interface_mtu'],my_object["ip_2"],dbd2['ospf.db.interface_mtu'])
+    a="Sequence Number Mismatch\n{}'s  SEQ :{} <==> {}'s  SEQ :{} ".format(my_object["ip_1"],dbd1['ospf.db.dd_sequence'],my_object["ip_2"],dbd2['ospf.db.dd_sequence'])
     count+=1
     analysis.append(a)
 
@@ -199,7 +199,7 @@ else:
 
 if dbd1['ospf.db.interface_mtu']!=dbd2['ospf.db.interface_mtu']:
         print(dbd1['ospf.db.interface_mtu'],dbd2['ospf.db.interface_mtu'])
-        a="MTU Mismatch\n{}'s  MTU :{} <==> {}'s  MTU :{} ".format(my_object["ip_1"],dbd1['ospf.db.dd_sequence'],my_object["ip_2"],dbd2['ospf.db.dd_sequence'])
+        a="MTU Mismatch\n{}'s  MTU :{} <==> {}'s  MTU :{} ".format(my_object["ip_1"],dbd1['ospf.db.interface_mtu'],my_object["ip_2"],dbd2['ospf.db.interface_mtu'])
 
         count+=1
         analysis.append(a)
