@@ -1,0 +1,138 @@
+from scapy.all import *
+from scapy.contrib.ospf import *
+import pickle
+
+with open('data_HBD.pkl', 'rb') as f:
+    my_object = pickle.load(f)
+    print(my_object)
+
+packets = rdpcap(my_object["filename_1"])
+
+dict_ospf={"Hello_1":[],
+           "Hello_2":[],
+           "DBD_1":[],
+           "DBD_2":[]
+           }
+Pcap1_info=[]
+Inference=[]
+Insights=[]
+
+count=0
+
+for packet in packets:
+    if packet[IP].src==my_object["ip_1"]:
+        if packet.haslayer(OSPF_Hdr):
+            if packet.haslayer(OSPF_Hello):
+                dict_ospf["Hello_1"].append(packet)
+                hell_1 = packet
+            if packet.haslayer(OSPF_DBDesc):
+                dict_ospf["DBD_1"].append(packet)
+            
+    if packet[IP].src==my_object["ip_2"]:
+        if packet.haslayer(OSPF_Hdr):
+            if packet.haslayer(OSPF_Hello):
+                dict_ospf["Hello_2"].append(packet)
+                hell_2 = packet
+            if packet.haslayer(OSPF_DBDesc):
+                dict_ospf["DBD_2"].append(packet)
+
+
+if len(dict_ospf["Hello_1"])==0:
+    a="OSPF packets not receieved from  {}".format(my_object["ip_1"])
+    Pcap1_info.append(a)
+    count+=1
+if len(dict_ospf["Hello_2"])==0:
+    a="OSPF packets not receieved from  {}".format(my_object["ip_2"])
+    Pcap1_info.append(a)
+    count+=1
+if (hell_1[OSPF_Hdr].area != hell_2[OSPF_Hdr].area):
+    count+=1
+    Pcap1_info.append("Area Mismatch Detected.\nArea from",hell_1[IP].src,"is",hell_1[OSPF_Hdr].area,"\nArea from",hell_2[IP].src,"is",hell_2[OSPF_Hdr].area)
+    Inference.append("Neighborship state: Not in INIT state\nReason: Area mismatch")
+    Insights.append("Configure the same area on both the devices.")
+if (hell_1[OSPF_Hdr].authtype != hell_2[OSPF_Hdr].authtype):
+    count+=1
+    Pcap1_info.append("Authorization Mismatch Detected.\nAuth from",hell_1[IP].src,"is",hell_1[OSPF_Hdr].authtype,"\nAuth from",hell_2[IP].src,"is",hell_2[OSPF_Hdr].authtype)
+    Inference.append("Neighborship state: Not in INIT state\nReason: Authorization Type mismatch")
+    Insights.append("Configure the same authtype on both the devices.")
+if (hell_1[OSPF_Hello].mask != hell_2[OSPF_Hello].mask):
+    count+=1
+    Pcap1_info.append("Subnetmask Mismatch Detected.\nSubnetmask from",hell_1[IP].src,"is",hell_1[OSPF_Hdr].mask,"\nSubnetmask from",hell_2[IP].src,"is",hell_2[OSPF_Hdr].mask)
+    Inference.append("Neighborship state: Not in INIT state\nReason: Subnetmask mismatch")
+    Insights.append("Configure the same subnetmask on both the devices.")
+if (hell_1[OSPF_Hello].hellointerval != hell_2[OSPF_Hello].hellointerval):
+    count+=1
+    Pcap1_info.append("Hello interval Mismatch Detected.\nHello interval from",hell_1[IP].src,"is",hell_1[OSPF_Hdr].hellointerval,"\nHello interval from",hell_2[IP].src,"is",hell_2[OSPF_Hdr].hellointerval)
+    Inference.append("Neighborship state: Not in INIT state\nReason: Hello interval mismatch")
+    Insights.append("Configure the same hello interval on both the devices.")
+if (hell_1[OSPF_Hello].deadinterval != hell_2[OSPF_Hello].deadinterval):
+    count+=1
+    Pcap1_info.append("Deadinterval Mismatch Detected.\nDead interval from",hell_1[IP].src,"is",hell_1[OSPF_Hdr].authtype,"\nDead interval from",hell_2[IP].src,"is",hell_2[OSPF_Hdr].deadinterval)
+    Inference.append("Neighborship state: Not in INIT state\nReason: Dead interval mismatch")
+    Insights.append("Configure the same dead interval on both the devices.")
+if (hell_1[OSPF_Hdr].src == hell_2[OSPF_Hdr].src):
+    count+=1
+    Pcap1_info.append("Router-id issue detected.\nRouter-id from",hell_1[IP].src,"is",hell_1[OSPF_Hdr].src,"\nRouter-id from",hell_2[IP].src,"is",hell_2[OSPF_Hdr].src)
+    Inference.append("Neighborship state: Not in INIT state\nReason: Same Router-id")
+    Insights.append("Configure different router-ids on both the devices.\nNote: Router-ids must be unique")
+
+if str(hell_2[OSPF_Hello].neighbors)!="[\'"+hell_1[OSPF_Hdr].src+"\']" and str(hell_1[OSPF_Hello].neighbors)=="[\'"+hell_2[OSPF_Hdr].src+"\']":
+    Pcap1_info.append("Neighbor from",hell_1[IP].src,"is",hell_1[OSPF_Hello].neighbors,"\nNeighbor from",hell_2[IP].src,"is",hell_2[OSPF_Hello].neighbors)
+    Inference.append("Neighborship state: Struck in 2-way state\nReason: Neighbor is not listed in the hello packet")
+    Insights.append("Might be possible that\nThe neighbor is establishing neighborship with DROther")
+
+if hell_1[OSPF_Hello].router!=my_object["ip_1"] and hell_1[OSPF_Hello].backup!=my_object["ip_1"]:
+    count+=1
+    print(my_object["ip_1"],hell_1[OSPF_Hello].router,hell_1[OSPF_Hello].backup)
+    Pcap1_info.append("DR =",hell_1[OSPF_Hello].router,"\nBDR =",hell_1[OSPF_Hello].backup)
+    Inference.append("Inference:",hell_1[IP].src,"is not the DR or BDR")
+    Insights.append("Check the configurations")
+
+if hell_2[OSPF_Hello].router!=my_object["ip_2"] and hell_2[OSPF_Hello].backup!=my_object["ip_2"]:
+    count+=1
+    Pcap1_info.append("DR =",hell_2[OSPF_Hello].router,"\nBDR =",hell_2[OSPF_Hello].backup)
+    Inference.append("Inference:",hell_2[IP].src,"is not the DR or BDR")
+    Insights.append("Check the configurations")
+
+if len(dict_ospf["DBD_1"])==0:
+    count+=1
+    Pcap1_info.append("DBD packets not received from {}".format(my_object["ip_1"]))
+    Inference.append("Neighborship: Struck at Exstart/Exchange state")
+    Insights.append("Check the Unicast Reachability\nCPU Utilization\nCongestion in the network")
+
+    new_var={"Pcap1_info":Pcap1_info,"Inference":Inference,"Insights":Insights}
+    with open('OSPF_info_1.pkl', 'wb') as fp:
+        pickle.dump(new_var, fp)
+        print('dictionary saved successfully to file')
+    quit()
+    
+    
+
+if len(dict_ospf["DBD_2"])==0:
+    count+=1
+    Pcap1_info.append("DBD packets not received from {}".format(my_object["ip_2"]))
+    Inference.append("Neighborship: Struck at Exstart/Exchange state")
+    Insights.append("Check the Unicast Reachability\nCPU Utilization\nCongestion in the network")
+
+    new_var={"Pcap1_info":Pcap1_info,"Inference":Inference,"Insights":Insights}
+    with open('OSPF_info_1.pkl', 'wb') as fp:
+        pickle.dump(new_var, fp)
+        print('dictionary saved successfully to file')
+    quit()
+    
+if hell_1.haslayer(OSPF_DBDesc) and hell_2.haslayer(OSPF_DBDesc):
+    if hell_1[OSPF_DBDesc].mtu!=hell_2[OSPF_DBDesc].mtu:
+        Pcap1_info.append("MTU issue detected\nThe MTU from",hell_1[IP].src,"is",hell_1[OSPF_DBDesc].mtu,"\nThe MTU from",hell_2[IP].src,"is",hell_2[OSPF_DBDesc].mtu)
+        Inference.append("Neighborship: Struck at Exchange state")
+        Insights.append("Configure the same MTU")    
+        new_var={"Pcap1_info":Pcap1_info,"Inference":Inference,"Insights":Insights}
+        with open('OSPF_info_1.pkl', 'wb') as fp:
+            pickle.dump(new_var, fp)
+            print('dictionary saved successfully to file')
+        quit()
+
+print(Pcap1_info,Inference,Insights)
+new_var={"Pcap1_info":Pcap1_info,"Inference":Inference,"Insights":Insights}
+with open('OSPF_info_1.pkl', 'wb') as fp:
+    pickle.dump(new_var, fp)
+    print('dictionary saved successfully to file')
