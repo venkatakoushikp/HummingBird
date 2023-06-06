@@ -20,7 +20,7 @@ humm_bird.geometry('1010x750')
 humm_bird.resizable(0,0)
 humm_bird.title("HummingBird")
 
-image = Image.open("/Users/priya.saragadam/Downloads/arista_logo.ong.png")
+image = Image.open("/Users/venkata.koushik/Downloads/aristalogo.png")
 image=image.resize((150,40))
 image = ImageTk.PhotoImage(image)
 label = tk.Label(humm_bird, image=image)
@@ -73,7 +73,7 @@ ana_text_re.place(x=10,y=10)
 ## ## ## ## ## ## ##
 def on_open():
     humm_bird.destroy()
-    import Main_Program
+    import entry_screen
 
 
 def cap_ana():
@@ -119,7 +119,8 @@ def on_show():
     import packet_show
 def on_report():
     if my_object2['Analysis']==[]:
-        sol_text.configure(text=" No errors. All checks passed")                 #Insights
+        sol_text.configure(text=" No errors")
+        ana_text.configure(text="OSPF Neighborship up")
     else:
         final_s=""
         for i in my_object2["Analysis"]:
@@ -127,21 +128,26 @@ def on_report():
             final_s+='\n'
         sol_text.configure(text=final_s)
     if my_object2["Info"]==[]:
-        ana_text.configure(text="The interfaces in the port-channel are active")  #Inference made
+        ana_text.configure(text="Hasnt even reached INIT State")
+        ana1_text.configure(text="Parameter Mismatch, Check Insights for suggestions")
+        for i in my_object2["Analysis"]:
+            if "OSPF packets not receieved from  {}".format(my_object["ip_1"]) in i:
+                sol_text.configure(text="OSPF down on current device")
+            if "OSPF packets not receieved from  {}".format(my_object["ip_2"]) in i:
+                sol_text.configure(text="OSPF down on peer\nPassive Interface Configured\nACL is blocking hello\nIntermediate Device Droping Hello packets\nSVI Down\nAddress not advertised")
+
     else:
         final_s=""
         for i in my_object2["Info"]:
             final_s+=i
-            final_s+='\n'
-        ana_text.configure(text=final_s)
-    if my_object2["Ana_t"]==[]:
-        ana1_text.configure(text="No erroneous packets found\nAll packets perfect!")   #pcap data
-    else:
-        final_s=""
-        for i in my_object2["Ana_t"]:
-            final_s+=i
-            final_s+='\n'
+            final_s+=' reached \n'
         ana1_text.configure(text=final_s)
+    if str(my_object2["Analysis"])[3:6]=='010':
+        ana_text.configure(text=my_object2["Analysis"])
+        sol_text.configure(text="From {}'s side , Possiblitites:\n\n Unicast Reachability Issue or ACL Applied\nHigh CPU utilization\nCongestion in Network".format(my_object["ip_1"]))
+    for i in my_object2["Analysis"]:
+        if "MTU" in i:
+            ana_text.configure(text="Stuck in EXCHANGE STATE")
 
 
     

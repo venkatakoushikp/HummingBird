@@ -1,18 +1,20 @@
 
 import time
-a=time.time()
-import pyshark
-capture = pyshark.FileCapture("/Users/venkata.koushik/ospf_day1.pcap")
 
+tim=time.time()
 
 import pickle
 with open('data_HBD.pkl', 'rb') as f:
     my_object = pickle.load(f)
     print(my_object)
-a=time.time()
+
 with open('data_HBD.pkl', 'rb') as f:
     my_object = pickle.load(f)
     print(my_object)
+
+import pyshark
+capture = pyshark.FileCapture(my_object['filename_1'])
+
 
 dict_ospf={"Hello_1":[],
            "Hello_2":[],
@@ -58,38 +60,47 @@ except:
     with open('OSPF_info.pkl', 'wb') as fp:
         pickle.dump(new_var, fp)
         print('dictionary saved successfully to file')
+    print(time.time()-tim)
     quit()
 
 hell_1=hell_1.ospf._all_fields
 hell_2=hell_2.ospf._all_fields
 
 if (hell_1['ospf.area_id'] != hell_2['ospf.area_id']):
-    a="(002) Area Mismatch"
+    a="Area Mismatch, \n{}'s  Area :{} <==> {}'s  Area :{} ".format(my_object["ip_1"],hell_1['ospf.area_id'],my_object["ip_2"],hell_2['ospf.area_id'])
     count+=1
     analysis.append(a)
 if hell_1['ospf.auth.type'] != hell_2['ospf.auth.type']:
-    a="(003) Authorization Mismatch"
+    a="Authorization Mismatch \n{}'s  Auth :{} <==> {}'s  Auth :{} ".format(my_object["ip_1"],hell_1['ospf.auth.type'],my_object["ip_2"],hell_2['ospf.auth.type'])
     count+=1
     analysis.append(a)
 if (hell_1['ospf.hello.network_mask'] != hell_2['ospf.hello.network_mask']):
-    a="(004) Different Subnet mask"
+    a="Different Subnet mask \n{}'s  Mask :{} <==> {}'s  Mask :{} ".format(my_object["ip_1"],hell_1['ospf.hello.network_mask'],my_object["ip_2"],hell_2['ospf.hello.network_mask'])
     count+=1
     analysis.append(a)
 if (hell_1['ospf.hello.hello_interval'] != hell_2['ospf.hello.hello_interval']):
-    a="(005) Different hellointerval"
+    a="Different hellointerval\n{}'s  Hello :{} <==> {}'s  Hellp :{} ".format(my_object["ip_1"],hell_1['ospf.hello.hello_interval'],my_object["ip_2"],hell_2['ospf.hello.hello_interval'])
     count+=1
     analysis.append(a)
 if (hell_1['ospf.hello.router_dead_interval'] != hell_2['ospf.hello.router_dead_interval']):
-    a="(006) Different deadinterval"
+    a="Different deadinterval\n{}'s  Dead :{} <==> {}'s  Dead :{} ".format(my_object["ip_1"],hell_1['ospf.hello.router_dead_interval'],my_object["ip_2"],hell_2['ospf.hello.router_dead_interval'])
     count+=1
     analysis.append(a)
 if (hell_1['ospf.srcrouter'] == hell_2['ospf.srcrouter']):
-    a="(007) Same Router ID"
+    a="Same Router ID\n{}'s  Router ID :{} <==> {}'s  Router ID :{} ".format(my_object["ip_1"],hell_1['ospf.srcrouter'],my_object["ip_2"],hell_2['ospf.srcrouter'])
     count+=1
     analysis.append(a)
 
 if count==0:
     info.append("INIT STATE")
+else:
+    new_var={"Info":info,"Analysis":analysis}
+    print(new_var)
+    with open('OSPF_info.pkl', 'wb') as fp:
+        pickle.dump(new_var, fp)
+        print('dictionary saved successfully to file')
+    print(time.time()-tim)
+    quit()  
 
 if hell_2['ospf.hello.active_neighbor']!=hell_1['ospf.srcrouter'] and hell_1['ospf.hello.active_neighbor']!=hell_2['ospf.srcrouter']:
     a="(013)Peer is not the active neighbor"
@@ -98,9 +109,17 @@ if hell_2['ospf.hello.active_neighbor']!=hell_1['ospf.srcrouter'] and hell_1['os
 
 if count==0:
     info.append("2 Way")
-if hell_1['ospf.srcrouter']!=my_object["ip_1"] and hell_1['ospf.hello.backup_designated_router']!=my_object["ip_1"]:
+else:
+    new_var={"Info":info,"Analysis":analysis}
+    print(new_var)
+    with open('OSPF_info.pkl', 'wb') as fp:
+        pickle.dump(new_var, fp)
+        print('dictionary saved successfully to file')
+    print(time.time()-tim)
+    quit()  
+if hell_1['ospf.hello.designated_router']!=my_object["ip_1"] and hell_1['ospf.hello.backup_designated_router']!=my_object["ip_1"]:
     count+=1
-    a="(008) Neither DR NOR BDR"
+    a=" Neither DR NOR BDR, Supposed to be in 2 way "
     analysis.append(a)
 '''if hell_2['ospf.srcrouter']!=my_object["ip_2"] and hell_2['ospf.hello.backup_designated_router']!=my_object["ip_2"]:
     count+=1
@@ -109,52 +128,74 @@ if hell_1['ospf.srcrouter']!=my_object["ip_1"] and hell_1['ospf.hello.backup_des
 
 if count==0:
     info.append("EX Start")
+else:
+    new_var={"Info":info,"Analysis":analysis}
+    print(new_var)
+    with open('OSPF_info.pkl', 'wb') as fp:
+        pickle.dump(new_var, fp)
+        print('dictionary saved successfully to file')
+    print(time.time()-tim)
+    quit()  
 
 if len(dict_ospf["DBD_1"])==0:
-    a="(010) DBD packets not received from {}".format(my_object["ip_1"])
+    a="(010) Couldnt find any DBD packets from {}".format(my_object["ip_1"])
     analysis.append(a)
     count+=1
     new_var={"Info":info,"Analysis":analysis}
     with open('OSPF_info.pkl', 'wb') as fp:
         pickle.dump(new_var, fp)
         print('dictionary saved successfully to file')
+    print(time.time()-tim)
     quit()
     
 
 if len(dict_ospf["DBD_2"])==0:
-    a="(011) DBD packets not received from {}".format(my_object["ip_2"])
+    a="(011) Couldnt find any DBD packets from {}".format(my_object["ip_2"])
     analysis.append(a)
     count+=1
     new_var={"Info":info,"Analysis":analysis}
     with open('OSPF_info.pkl', 'wb') as fp:
         pickle.dump(new_var, fp)
         print('dictionary saved successfully to file')
+    print(time.time()-tim)
     quit()
 
 if count==0:
     info.append("Exchange")
+else:
+    new_var={"Info":info,"Analysis":analysis}
+    print(new_var)
+    with open('OSPF_info.pkl', 'wb') as fp:
+        pickle.dump(new_var, fp)
+        print('dictionary saved successfully to file')
+    print(time.time()-a)
+    quit()  
 
 try:
     dbd1=capture[dict_ospf["DBD_1"][-1]]
     dbd2=capture[dict_ospf["DBD_2"][-1]]
 
-    if dbd1['ospf.db.interface_mtu']!=dbd2['ospf.db.interface_mtu']:
-        a="(012) MTU Mismatch"
-        count+=1
-        analysis.append(a)
 except:
     IndexError
     print(info,analysis)
     new_var={"Info":info,"Analysis":analysis}
     with open('OSPF_info.pkl', 'wb') as fp:
         pickle.dump(new_var, fp)
-        print('dictionary saved successfully to file')
+        print('dictionary saved successfully to file2')
+    quit()
+dbd1=dbd1.ospf._all_fields
+dbd2=dbd2.ospf._all_fields
+
+if dbd1['ospf.db.interface_mtu']!=dbd2['ospf.db.interface_mtu']:
+        print(dbd1['ospf.db.interface_mtu'],dbd2['ospf.db.interface_mtu'])
+        a="MTU Mismatch\n{}'s  MTU :{} <==> {}'s  MTU :{} ".format(my_object["ip_1"],dbd1['ospf.db.interface_mtu'],my_object["ip_2"],dbd2['ospf.db.interface_mtu'])
+
+        count+=1
+        analysis.append(a)
 
 print(info,analysis)
 new_var={"Info":info,"Analysis":analysis}
 with open('OSPF_info.pkl', 'wb') as fp:
     pickle.dump(new_var, fp)
     print('dictionary saved successfully to file')
-b=time.time()
-print(analysis,info)
-print(b-a)
+print(time.time()-tim)

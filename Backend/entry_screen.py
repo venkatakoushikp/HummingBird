@@ -101,13 +101,32 @@ def on_grab():
 
     def on_gen():
         try:
-            import subprocess
-            a=in_3.get()
-            cmd = "scp {}@".format(a)+ str(in_1.get())+":/{}".format(in_2.get())+" ." # add username and password , custom location
-            output = subprocess.check_output(cmd, shell=True, text=True)
-            a=str(in_2.get()).split("/")
-            vars['filename_1']=a[-1]
-            print(a)
+            import paramiko
+
+            def scp_file(source_path, destination_path, hostname, username, password):
+                try:
+                    client = paramiko.SSHClient()
+                    client.load_system_host_keys()
+                    client.set_missing_host_key_policy(paramiko.WarningPolicy())
+                    client.connect(hostname, username=username, password=password)
+                    scp = client.open_sftp()
+                    scp.put(source_path, destination_path)
+                    scp.close()
+                    client.close()
+                    messagebox.showwarning("","File grabbed succesfully")
+                except paramiko.AuthenticationException:
+                    messagebox.showwarning("","Authentication failed. Please check your credentials.")
+                except paramiko.SSHException as ssh_exception:
+                    messagebox.showwarning("","An SSH exception occurred:", str(ssh_exception))
+                except paramiko.SFTPError as sftp_exception:
+                    messagebox.showwarning("","An SFTP exception occurred:", str(sftp_exception))
+                except Exception as e:
+                    messagebox.showwarning("","An error occurred:", str(e)[9:])
+
+            # Example usage
+            scp_file("abc.pcap", str(in_2.get()), str(in_1.get()), str(in_3.get()), str(in_4.get()))
+
+            vars['filename_1']='abc.pcap'
             selected_fil.configure(text="Selected File 1:{}".format(vars["filename_1"]))
         except:
             Exception
@@ -211,7 +230,7 @@ def on_att():
                 up_p2.configure(state='active')
                 gb_p.configure(state='active')
             else:
-                print("No")
+                messagebox.showerror("","Mention Valid IP address")
 
         b2=tk.Button(new_win,text="Proceed",command=on_next)
         b2.place(x=250,y=120)
@@ -307,21 +326,40 @@ def on_grab():
     in_4=tk.Entry(grabber,width=25)
     in_4.place(x=210,y=170)
 
-
     def on_gen():
         try:
-            import subprocess
-            a=in_3.get()
-            cmd = "scp {}@".format(a)+ str(in_1.get())+":/{}".format(in_2.get())+" ." # add username and password , custom location
-            output = subprocess.check_output(cmd, shell=True, text=True)
-            a=str(in_2.get()).split("/")
-            vars['filename_1']=a[-1]
-            print(a)
+            import paramiko
+
+            def scp_file(source_path, destination_path, hostname, username, password):
+                try:
+                    client = paramiko.SSHClient()
+                    client.load_system_host_keys()
+                    client.set_missing_host_key_policy(paramiko.WarningPolicy())
+                    client.connect(hostname, username=username, password=password)
+                    scp = client.open_sftp()
+                    scp.put(source_path, destination_path)
+                    scp.close()
+                    client.close()
+                    messagebox.showwarning("","File grabbed succesfully")
+                except paramiko.AuthenticationException:
+                    messagebox.showwarning("","Authentication failed. Please check your credentials.")
+                except paramiko.SSHException as ssh_exception:
+                    messagebox.showwarning("","An SSH exception occurred:", str(ssh_exception))
+                except paramiko.SFTPError as sftp_exception:
+                    messagebox.showwarning("","An SFTP exception occurred:", str(sftp_exception))
+                except Exception as e:
+                    messagebox.showwarning("","An error occurred:", str(e)[9:])
+
+            # Example usage
+            scp_file("abc.pcap", str(in_2.get()), str(in_1.get()), str(in_3.get()), str(in_4.get()))
+
+            vars['filename_1']='abc.pcap'
             selected_fil.configure(text="Selected File 1:{}".format(vars["filename_1"]))
         except:
             Exception
-            mb.showerror("","Please Recheck the inputs")
+            mb.showerror("","Host not Reachable")
 
+    
     bu1=tk.Button(grabber,text="GET PCAP",command=on_gen)
     bu1.place(x=220,y=220)
     if vars['protocol']=='OSPF':
@@ -350,22 +388,39 @@ def on_grab():
         in_41=tk.Entry(grabber,width=25)
         in_41.place(x=210,y=470)
 
-
         def on_gen2():
             try:
-                import subprocess
-                a=in_31.get()
-                cmd = "scp {}@".format(a)+ str(in_11.get())+":/{}".format(in_21.get())+" ."  # add username and password , custom location
-                output = subprocess.check_output(cmd, shell=True, text=True)
-                a=str(in_21.get()).split("/")
-                print(a)
-                vars['filename_2']=a[-1]
+                import paramiko
 
+                def scp_file(source_path, destination_path, hostname, username, password):
+                    try:
+                        client = paramiko.SSHClient()
+                        client.load_system_host_keys()
+                        client.set_missing_host_key_policy(paramiko.WarningPolicy())
+                        client.connect(hostname, username=username, password=password)
+                        scp = client.open_sftp()
+                        scp.put(source_path, destination_path)
+                        scp.close()
+                        client.close()
+                        messagebox.showwarning("","File grabbed succesfully")
+                    except paramiko.AuthenticationException:
+                        messagebox.showwarning("","Authentication failed. Please check your credentials.")
+                    except paramiko.SSHException as ssh_exception:
+                        messagebox.showwarning("","An SSH exception occurred:", str(ssh_exception))
+                    except paramiko.SFTPError as sftp_exception:
+                        messagebox.showwarning("","An SFTP exception occurred:", str(sftp_exception))
+                    except Exception as e:
+                        messagebox.showwarning("","An error occurred:", str(e)[9:])
 
-                selected_fil2.configure(text="Selected File 2:{}".format(vars["filename_2"]))
+                # Example usage
+                scp_file("grab2.pcap", str(in_21.get()), str(in_11.get()), str(in_31.get()), str(in_41.get()))
+
+                vars['filename_1']='abc.pcap'
+                selected_fil.configure(text="Selected File 2:{}".format(vars["filename_2"]))
             except:
                 Exception
                 mb.showerror("","Please Recheck the inputs")
+
 
         bu1=tk.Button(grabber,text="GET PCAP",command=on_gen2)
         bu1.place(x=220,y=520)
@@ -400,8 +455,8 @@ def on_proceed():
 
 
         humm_bird.destroy()
-        import ospf
-        import Demo_        
+    import trial
+    import Demo_        
 prcd=tk.Button(humm_bird,text="Proceed",command=on_proceed)
 prcd.place(x=900,y=350)
 
