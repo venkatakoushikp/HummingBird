@@ -143,11 +143,13 @@ def on_report():
             final_s+=' reached \n'
         ana1_text.configure(text=final_s)
     if str(my_object2["Analysis"])[3:6]=='010':
-        ana_text.configure(text=my_object2["Analysis"])
+        ana_text.configure(text=my_object2["Analysis"][0][5:])
         sol_text.configure(text="From {}'s side , Possiblitites:\n\n Unicast Reachability Issue or ACL Applied\nHigh CPU utilization\nCongestion in Network".format(my_object["ip_1"]))
     for i in my_object2["Analysis"]:
         if "MTU" in i:
             ana_text.configure(text="Stuck in EXCHANGE STATE")
+        if "Seq" in i:
+            ana_text.configure(text="Stuck in EX Start STATE")
 
 
     

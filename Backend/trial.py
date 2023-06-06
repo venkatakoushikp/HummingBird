@@ -65,6 +65,7 @@ except:
 
 hell_1=hell_1.ospf._all_fields
 hell_2=hell_2.ospf._all_fields
+print(hell_1,hell_2,sep="\n\n\n")
 
 if (hell_1['ospf.area_id'] != hell_2['ospf.area_id']):
     a="Area Mismatch, \n{}'s  Area :{} <==> {}'s  Area :{} ".format(my_object["ip_1"],hell_1['ospf.area_id'],my_object["ip_2"],hell_2['ospf.area_id'])
@@ -88,6 +89,10 @@ if (hell_1['ospf.hello.router_dead_interval'] != hell_2['ospf.hello.router_dead_
     analysis.append(a)
 if (hell_1['ospf.srcrouter'] == hell_2['ospf.srcrouter']):
     a="Same Router ID\n{}'s  Router ID :{} <==> {}'s  Router ID :{} ".format(my_object["ip_1"],hell_1['ospf.srcrouter'],my_object["ip_2"],hell_2['ospf.srcrouter'])
+    count+=1
+    analysis.append(a)
+if hell_1['ospf.hello.designated_router']!=hell_2['ospf.hello.designated_router']:
+    a="Different Broadcast Domain\n{}'s  DR :{} <==> {}'s  DR :{} ".format(my_object["ip_1"],hell_1['ospf.hello.designated_router'],my_object["ip_2"],hell_2['ospf.hello.designated_router'])
     count+=1
     analysis.append(a)
 
@@ -159,22 +164,10 @@ if len(dict_ospf["DBD_2"])==0:
         print('dictionary saved successfully to file')
     print(time.time()-tim)
     quit()
-
-if count==0:
-    info.append("Exchange")
-else:
-    new_var={"Info":info,"Analysis":analysis}
-    print(new_var)
-    with open('OSPF_info.pkl', 'wb') as fp:
-        pickle.dump(new_var, fp)
-        print('dictionary saved successfully to file')
-    print(time.time()-a)
-    quit()  
-
 try:
     dbd1=capture[dict_ospf["DBD_1"][-1]]
     dbd2=capture[dict_ospf["DBD_2"][-1]]
-
+    
 except:
     IndexError
     print(info,analysis)
@@ -186,9 +179,27 @@ except:
 dbd1=dbd1.ospf._all_fields
 dbd2=dbd2.ospf._all_fields
 
+if dbd1['ospf.db.dd_sequence']!=dbd2['ospf.db.dd_sequence']:
+    print(dbd1['ospf.db.dd_sequence'],dbd2['ospf.db.dd_sequence'])
+    a="Sequence Number Mismatch\n{}'s  SEQ :{} <==> {}'s  SEQ :{} ".format(my_object["ip_1"],dbd1['ospf.db.interface_mtu'],my_object["ip_2"],dbd2['ospf.db.interface_mtu'])
+    count+=1
+    analysis.append(a)
+
+if count==0:
+    info.append("Exchange")
+else:
+    new_var={"Info":info,"Analysis":analysis}
+    print(new_var)
+    with open('OSPF_info.pkl', 'wb') as fp:
+        pickle.dump(new_var, fp)
+        print('dictionary saved successfully to file')
+    print(time.time()-tim)
+    quit()  
+
+
 if dbd1['ospf.db.interface_mtu']!=dbd2['ospf.db.interface_mtu']:
         print(dbd1['ospf.db.interface_mtu'],dbd2['ospf.db.interface_mtu'])
-        a="MTU Mismatch\n{}'s  MTU :{} <==> {}'s  MTU :{} ".format(my_object["ip_1"],dbd1['ospf.db.interface_mtu'],my_object["ip_2"],dbd2['ospf.db.interface_mtu'])
+        a="MTU Mismatch\n{}'s  MTU :{} <==> {}'s  MTU :{} ".format(my_object["ip_1"],dbd1['ospf.db.dd_sequence'],my_object["ip_2"],dbd2['ospf.db.dd_sequence'])
 
         count+=1
         analysis.append(a)
