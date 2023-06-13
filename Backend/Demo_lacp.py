@@ -52,7 +52,7 @@ analysis_text.place(x=10,y=10)
 ana_text=tk.Label(analysis_banner,text=" Start Report Generation",font=("Times New Roman",13),fg='yellow',bg='black')
 ana_text.place(x=10,y=40)
 
-solutions_banner=tk.Canvas(humm_bird,border=0,width=400,height=200,bg='black')
+solutions_banner=tk.Canvas(humm_bird,border=0,width=420,height=200,bg='black')
 solutions_banner.place(x=500,y=420)
 
 solns_text=tk.Label(solutions_banner,text="Insights",font=('Times New Roman',15),fg='#00FF00',bg='black')
@@ -119,29 +119,29 @@ def on_show():
     import packet_show
 def on_report():
     if my_object2['Analysis']==[]:
-        sol_text.configure(text=" No errors. All checks passed")                 #Insights
+        sol_text.configure(text="No errors. All checks passed",font=("Times New Roman",15),justify='left',fg='cyan')                 #Insights
     else:
         final_s=""
         for i in my_object2["Analysis"]:
             final_s+=i
             final_s+='\n'
-        sol_text.configure(text=final_s)
+        sol_text.configure(text=final_s,font=("Times New Roman",15),justify='left')
     if my_object2["Info"]==[]:
-        ana_text.configure(text="The interfaces in the port-channel are active")  #Inference made
+        ana_text.configure(text="This interface in the port-channel is active",justify='left',font=("Times New Roman",15),fg='cyan')  #Inference made
     else:
         final_s=""
         for i in my_object2["Info"]:
             final_s+=i
             final_s+='\n'
-        ana_text.configure(text=final_s)
+        ana_text.configure(text=final_s,font=("Times New Roman",15),justify='left')
     if my_object2["Ana_t"]==[]:
-        ana1_text.configure(text="No erroneous packets found\nAll packets perfect!")   #pcap data
+        ana1_text.configure(text="No erroneous packets found\nAll packets perfect!",justify='left',font=("Times New Roman",15))   #pcap data
     else:
         final_s=""
         for i in my_object2["Ana_t"]:
             final_s+=i
             final_s+='\n'
-        ana1_text.configure(text=final_s)
+        ana1_text.configure(text=final_s,font=("Times New Roman",15),justify='left')
 
 
     
