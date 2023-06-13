@@ -1,8 +1,3 @@
-'''
-Code for automating the troubleshooting of LACP via the packets from the pcap file
-Created by Lakshmi Priya Saragadam, May 20, 2023.
-HummingBird- The deep packet inspection tool
-'''
 from scapy.all import *
 from scapy.contrib.lacp import *
 import pickle
@@ -41,7 +36,7 @@ if len(dict_ospf["LACP_packet"])==0:
 #hell_1 = packets[dict_ospf["LACP_packet"][-1]]
 
 if  (hell_1[LACP].partner_system == '00:00:00:00:00:00'):
-        a = "Check if the following config is given at the interface level:\n''channel-group <oper-key> mode active'' on the partner interface."
+        a = "Check if the interface is an L2 interface(Switchport)\nCheck if the following config is given at the interface level:\n''channel-group <oper-key> mode active'' on the partner interface."
         count+=1
         analysis.append(a)
         info.append("Partner Sys-id is 00:00:00:00:00:00")
@@ -73,17 +68,17 @@ elif (hell_1[LACP].actor_state != hell_1[LACP].partner_state):
         info.append("Passive flag set on both actor and partner")
         ana_t.append("Actor-passive and Partner-passive -> No LACP negotiation")
     if (aggregation_bit_1 != aggregation_bit):
-        a = "Check the following:\nLink speeds on both the actor and partner systems\nThe no. of ports per port-channel to be bundelled."
+        a = "Check the following:\nLink speeds on both the actor and partner systems.\nThe no. of ports per port-channel to be bundelled."
         count+=1
         analysis.append(a)
         info.append("Aggregation bit mismatch")
         ana_t.append("The speed of the links might be different.\nMismatch in the bundelled ports of actor and partner.")
     if (timeout_bit == 1 or timeout_bit_1==1):
-        a= "Check if the interfaces are shutdown.\nCheck if the port-channel is shutdown.\nCheck if the device is running LACP."
+        a= "Check if the interfaces are shutdown.\nCheck if the port-channel is shutdown\nCheck if the device is running LACP."
         count+=1
         analysis.append(a)
         info.append("TimeOut bit mismatch")
-        ana_t.append("Actor & partner should have same timeouts.\nIf not,then LACPDUs are not sent/received at expected timeout frames.")
+        ana_t.append("Actor & partner should have same timeouts\nIf not,then LACPDUs are not sent/received at expected timeout frames.")
     if (synchronization_bit_1 == 0) or (synchronization_bit==0):
         a = "Check if the interfaces are shutdown.\nCheck if the port-channel is shutdown.\nCheck if the device is running LACP.\nCheck for ACLs "
         count+=1
@@ -107,5 +102,5 @@ print(info,analysis)
 new_var={"Info":info,"Analysis":analysis,"Ana_t":ana_t}
 with open('OSPF_info.pkl', 'wb') as fp:
     pickle.dump(new_var, fp)
-    print('dictionary saved successfully to file')
+    print('Dictionary saved successfully to file')
     
