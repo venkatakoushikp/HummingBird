@@ -4,7 +4,7 @@
 # Additional Libraries 
   * Pyshark
   > pip install pyshark
-  *https://github.com/KimiNewt/pyshark/
+  > https://github.com/KimiNewt/pyshark/
   * Pickle
   > pip install pickle5
   * Pillow
